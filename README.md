@@ -1,5 +1,5 @@
-####reset-arduino
-##Reset an Arduino over the command line
+##reset-arduino
+####Reset an Arduino over the command line
 
 ---
 
