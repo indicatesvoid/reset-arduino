@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7F4F49C1188741380024F6B2 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F4F49C0188741380024F6B2 /* main.c */; };
+		7F4F49C1188741380024F6B2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F4F49C0188741380024F6B2 /* main.cpp */; };
 		7F4F49C3188741380024F6B2 /* reset_arduino.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F4F49C2188741380024F6B2 /* reset_arduino.1 */; };
+		7F4F49CB188741970024F6B2 /* Arduino.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F4F49C9188741970024F6B2 /* Arduino.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,8 +27,10 @@
 
 /* Begin PBXFileReference section */
 		7F4F49BD188741380024F6B2 /* reset-arduino */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "reset-arduino"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7F4F49C0188741380024F6B2 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		7F4F49C0188741380024F6B2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7F4F49C2188741380024F6B2 /* reset_arduino.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = reset_arduino.1; sourceTree = "<group>"; };
+		7F4F49C9188741970024F6B2 /* Arduino.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Arduino.cpp; sourceTree = "<group>"; };
+		7F4F49CA188741970024F6B2 /* Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arduino.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +63,9 @@
 		7F4F49BF188741380024F6B2 /* reset-arduino */ = {
 			isa = PBXGroup;
 			children = (
-				7F4F49C0188741380024F6B2 /* main.c */,
+				7F4F49C9188741970024F6B2 /* Arduino.cpp */,
+				7F4F49CA188741970024F6B2 /* Arduino.h */,
+				7F4F49C0188741380024F6B2 /* main.cpp */,
 				7F4F49C2188741380024F6B2 /* reset_arduino.1 */,
 			);
 			path = "reset-arduino";
@@ -117,7 +122,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F4F49C1188741380024F6B2 /* main.c in Sources */,
+				7F4F49CB188741970024F6B2 /* Arduino.cpp in Sources */,
+				7F4F49C1188741380024F6B2 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +201,7 @@
 		7F4F49C7188741380024F6B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -202,6 +209,7 @@
 		7F4F49C8188741380024F6B2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
