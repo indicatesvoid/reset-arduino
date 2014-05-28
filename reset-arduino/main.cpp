@@ -13,14 +13,15 @@ Arduino* arduino = new Arduino();
 
 int main(int argc, const char * argv[])
 {
+	printf("Getting ready to reset arduino...\n");
     // connect at 9600 baud
-    arduino->connect(9600);
+    //arduino->connect(9600);
     
     // attempt reset
-    arduino->reset();
+    //arduino->reset();
 
-    // insert code here...
-    // printf("Hello, World!\n");
+	delete arduino;
+    
     return 0;
 }
 

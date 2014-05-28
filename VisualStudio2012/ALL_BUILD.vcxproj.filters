@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\CMakeLists.txt" />
+    <CustomBuild Include="CMakeFiles\c9e1cda050101fb8335d0f0ed3b0f8fc\ALL_BUILD.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CMakeFiles\ALL_BUILD" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{EFC3F3EB-CCF7-4A54-9AB9-BDB51462F22F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,3 @@
+C:/Users/Stephen/Documents/GitHub/reset-arduino/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Stephen/Documents/GitHub/reset-arduino/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/Stephen/Documents/GitHub/reset-arduino/build/CMakeFiles/reset-arduino.dir

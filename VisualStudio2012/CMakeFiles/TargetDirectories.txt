@@ -1,0 +1,4 @@
+C:/Users/Stephen/Documents/GitHub/reset-arduino/VisualStudio2012/CMakeFiles/ALL_BUILD.dir
+C:/Users/Stephen/Documents/GitHub/reset-arduino/VisualStudio2012/libs/CMakeFiles/Arduino.dir
+C:/Users/Stephen/Documents/GitHub/reset-arduino/VisualStudio2012/CMakeFiles/ZERO_CHECK.dir
+C:/Users/Stephen/Documents/GitHub/reset-arduino/VisualStudio2012/CMakeFiles/reset-arduino.dir

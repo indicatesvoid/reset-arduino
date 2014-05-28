@@ -1,0 +1,19 @@
+﻿Build started 4/28/2014 4:21:54 PM.
+     1>Project "C:\Users\Stephen\Documents\GitHub\reset-arduino\VisualStudio2012\libs\Arduino.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino" /I"C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs" /Zi /nologo /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D TARGET_WIN32 /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"Arduino.dir\Debug\\" /Fd"Arduino.dir\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt "C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs\Arduino.cpp"
+         Arduino.cpp
+     1>C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs\Arduino.cpp(78): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdio.h(356) : see declaration of 'sprintf'
+     1>C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs\Arduino.cpp(165): warning C4018: '<' : signed/unsigned mismatch
+     1>C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs\Arduino.cpp(178): warning C4018: '<' : signed/unsigned mismatch
+     1>C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs\Arduino.cpp(206): warning C4018: '<' : signed/unsigned mismatch
+     1>C:\Users\Stephen\Documents\GitHub\reset-arduino\reset-arduino\libs\Arduino.cpp(211): warning C4018: '<' : signed/unsigned mismatch
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\Stephen\Documents\GitHub\reset-arduino\VisualStudio2012\libs\Debug\Arduino.lib" /NOLOGO Arduino.dir\Debug\Arduino.obj
+         Arduino.vcxproj -> C:\Users\Stephen\Documents\GitHub\reset-arduino\VisualStudio2012\libs\Debug\Arduino.lib
+     1>Done Building Project "C:\Users\Stephen\Documents\GitHub\reset-arduino\VisualStudio2012\libs\Arduino.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.74
