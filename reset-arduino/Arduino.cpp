@@ -19,12 +19,87 @@ using namespace std;
 Arduino::Arduino() {
     devices = buildDeviceList();
     arduinos = findArduinos();
+    bIsInited = bArduinoFound = false;
 }
 
-bool Arduino::connect(int baud = 9600) {
-    if(arduinos.size() == 0) cout << "No Arduinos found. Please plug one in and run the application again." << endl;
-    else if(arduinos.size() > 1) device_path = chooseActiveDevice();
+void Arduino::find() {
+    bArduinoFound = false;
+    
+    if(arduinos.size() == 0) {
+        std::cout << "No Arduinos found. Please plug one in and run the application again.\n" << endl;
+        return;
+    }
+    
+    if(arduinos.size() > 1) device_path = chooseActiveDevice();
     else device_path = arduinos[0];
+    bArduinoFound = true;
+}
+
+void Arduino::setBaud(int baud) {
+    // set baud rate
+    struct termios ComParams;
+    tcgetattr(fd, &ComParams);
+    oldoptions = ComParams;
+    
+    switch(baud){
+        case 300: 	cfsetispeed(&ComParams,B300);
+            cfsetospeed(&ComParams,B300);
+            break;
+        case 1200:
+            cfsetispeed(&ComParams,B1200);
+            cfsetospeed(&ComParams,B1200);
+            break;
+        case 2400: 	cfsetispeed(&ComParams,B2400);
+            cfsetospeed(&ComParams,B2400);
+            break;
+        case 4800: 	cfsetispeed(&ComParams,B4800);
+            cfsetospeed(&ComParams,B4800);
+            break;
+        case 9600: 	cfsetispeed(&ComParams,B9600);
+            cfsetospeed(&ComParams,B9600);
+            break;
+        case 14400: 	cfsetispeed(&ComParams,B14400);
+            cfsetospeed(&ComParams,B14400);
+            break;
+        case 19200: 	cfsetispeed(&ComParams,B19200);
+            cfsetospeed(&ComParams,B19200);
+            break;
+        case 28800: 	cfsetispeed(&ComParams,B28800);
+            cfsetospeed(&ComParams,B28800);
+            break;
+        case 38400: 	cfsetispeed(&ComParams,B38400);
+            cfsetospeed(&ComParams,B38400);
+            break;
+        case 57600:  cfsetispeed(&ComParams,B57600);
+            cfsetospeed(&ComParams,B57600);
+            break;
+        case 115200: cfsetispeed(&ComParams,B115200);
+            cfsetospeed(&ComParams,B115200);
+            break;
+            
+        default:
+            cfsetispeed(&ComParams,B9600);
+            cfsetospeed(&ComParams,B9600);
+            std::cout << "Cannot set " << baud << " bps, setting to 9600";
+            break;
+    }
+    
+    ComParams.c_cflag |= (CLOCAL | CREAD);
+    ComParams.c_cflag &= ~PARENB;
+    ComParams.c_cflag &= ~CSTOPB;
+    ComParams.c_cflag &= ~CSIZE;
+    ComParams.c_iflag &= (tcflag_t) ~(INLCR | IGNCR | ICRNL | IGNBRK);
+    ComParams.c_oflag &= (tcflag_t) ~(OPOST);
+    ComParams.c_cflag |= CS8;
+    tcsetattr( fd, TCSANOW, &ComParams );
+    
+    unsigned long retrievedBaud = cfgetospeed(&ComParams);
+    std::cout << "Setting baud rate " << to_string(retrievedBaud) << "\n";
+    currentBaud = retrievedBaud;
+}
+
+bool Arduino::openPort() {
+    bIsInited = false;
     
     // open the serial device
     fd = open(device_path.c_str(), O_RDWR | O_NONBLOCK);
@@ -34,24 +109,93 @@ bool Arduino::connect(int baud = 9600) {
         return false;
     }
     
-    // set baud rate
-    struct termios ComParams;
-    tcgetattr(fd, &ComParams);
-    ComParams.c_cflag &= baud;
-    ComParams.c_cflag |= B9600;
-    tcsetattr( fd, TCSANOW, &ComParams );
+    // safety - set baud rate once more after open
+    setBaud((int)currentBaud);
     
-    std::cout << "Success in opening serial port\n";
+    std::cout << "Success in opening serial port at " << device_path << std::endl;
+    struct termios opts;
+    tcgetattr(fd, &opts);
+    unsigned long retrievedBaud = cfgetospeed(&opts);
+    
+    std::cout << "At baud rate " << to_string(retrievedBaud) << "\n";
+    
+    bIsInited = true;
     return true;
 }
 
-void Arduino::reset() {
-    // set a high bit over the serial line, wait, then reset
-    // this will smack the Arduino into resetting
-    std::cout<<"Resetting Arduino..." << std::endl;
-    ioctl(fd, TIOCMBIS, TIOCM_DTR);
-    usleep(500);
-    ioctl(fd, TIOCMBIC, TIOCM_DTR);
+bool Arduino::connect(int baud, bool verbose) {
+    find();
+    setBaud(baud);
+    bool success = openPort();
+    
+    return success;
+}
+
+void Arduino::closePort() {
+    if(bIsInited) {
+//        tcsetattr(fd,TCSANOW,&oldoptions);
+        ::close(fd);
+        
+        std::cout << "Success in closing serial port at " << device_path << std::endl;
+        
+//        struct termios options;
+//        tcgetattr(fd, &options);
+//        options.c_cflag &= ~CRTSCTS; // RTS/CTS Flow Control
+//        options.c_cflag &= ~(CDTR_IFLOW | CDSR_OFLOW); // DTR/DSR Flow Control
+//        options.c_cflag &= ~CCAR_OFLOW; // DCD Flow Control
+//        tcsetattr(fd, TCSANOW, &options);
+//        
+//        tcsetattr(fd, TCSADRAIN, &oldoptions);
+//        fd = 0;
+        
+        
+        bIsInited = false;
+    }
+    
+    else std::cout << "Serial port at " << device_path << " is not open. Nothing to close." << std::endl;
+}
+
+void Arduino::reset(int _board) {
+    
+//    ser = serial.Serial(args.port[0], 57600)
+//    ser.close()
+//    ser.open()
+//    ser.close()
+//    ser.setBaudrate(1200)
+//    ser.open()
+//    ser.close()
+//    sleep(1)
+//    
+//    while not os.path.exists(args.port[0]):
+//        if args.verbose: print('Waiting for %s to come back' % args.port[0])
+//            sleep(1)
+//            
+//            if args.verbose: print('%s has come back after reset' % args.port[0])
+    if(!bArduinoFound) find();
+    
+    if(_board == LEONARDO) {
+        std::cout<<"Resetting Leonardo..." << std::endl;
+        // force reset using 1200bps open/close
+        setBaud(57600);
+        closePort();
+        openPort();
+        closePort();
+        
+        setBaud(1200);
+        openPort();
+        closePort();
+        sleep(1);
+    }
+    
+    else {
+        connect();
+        // set a high bit over the serial line, wait, then reset
+        // this will smack the Arduino into resetting
+        std::cout<<"Resetting Arduino..." << std::endl;
+        ioctl(fd, TIOCMBIS, TIOCM_DTR);
+        usleep(500);
+        ioctl(fd, TIOCMBIC, TIOCM_DTR);
+    }
 }
 
 //////////////////////////////////////////////

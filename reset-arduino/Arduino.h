@@ -17,12 +17,21 @@
 #include <getopt.h>
 #include <dirent.h>
 
+typedef enum {
+    LEONARDO,
+    OTHER
+} Boards;
+
 class Arduino {
     public:
         Arduino();
     
-        bool connect(int baud);
-        void reset();
+        void find();
+        void setBaud(int baud = 9600);
+        bool openPort();
+        void closePort();
+        bool connect(int baud = 9600, bool verbose = true);
+        void reset(int _board = OTHER);
     
     private:
 
@@ -34,6 +43,10 @@ class Arduino {
         std::string chooseActiveDevice();
 
     // VARIABLES
+        bool bIsInited, bArduinoFound;
+    
+        struct termios oldoptions;
+        unsigned long currentBaud;
 
         std::string device_path;
         int fd;
