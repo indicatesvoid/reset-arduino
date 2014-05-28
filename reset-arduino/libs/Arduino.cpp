@@ -129,7 +129,7 @@ void Arduino::close(){
 #else
 	//---------------------------------------------
 	if (bInited){
-		tcsetattr(fd, TCSANOW, &oldoptions);
+//		tcsetattr(fd, TCSANOW, &oldoptions);
 		::close(fd);
 	}
 	// [CHECK] -- anything else need to be reset?

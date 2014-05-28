@@ -7,7 +7,7 @@
 //
 
 #include <stdio.h>
-#include "Arduino.h"
+#include "libs/Arduino.h"
 
 Arduino* arduino = new Arduino();
 
@@ -18,7 +18,7 @@ int main(int argc, const char * argv[])
     //arduino->connect(9600);
     
     // attempt reset
-    //arduino->reset();
+//    arduino->reset();
 
 	delete arduino;
     
