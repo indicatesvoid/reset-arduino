@@ -1,6 +1,6 @@
 //
 //  Arduino.cpp
-//  Trenchcoat
+//  reset-arduino
 //
 //  Created by William A. Clark on 6/14/13.
 //  Based off of the OpenFrameworks ofSerial class
@@ -22,104 +22,191 @@ Arduino::Arduino() {
 }
 
 Arduino::~Arduino() {
-
-
 }
 
-bool Arduino::connect(int baud = 9600) {
-	bInited = false;
-
-    if(arduinos.size() == 0) cout << "No Arduinos found. Please plug one in and run the application again." << endl;
-    else if(arduinos.size() > 1) device_path = chooseActiveDevice();
+void Arduino::find() {
+    bArduinoFound = false;
+    
+    if(arduinos.size() == 0) {
+        std::cout << "No Arduinos found. Please plug one in and run the application again.\n" << endl;
+        return;
+    }
+    
+    if(arduinos.size() > 1) device_path = chooseActiveDevice();
     else device_path = arduinos[0];
-    
-	//---------------------------------------------
-	#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
-	//---------------------------------------------
-
-		// open the serial device
-		fd = open(device_path.c_str(), O_RDWR | O_NONBLOCK);
-    
-		if(fd == -1){
-			std::cout << "Unable to open port\n";
-			return false;
-		}
-    
-		// set baud rate
-		struct termios ComParams;
-		tcgetattr(fd, &ComParams);
-		ComParams.c_cflag &= baud;
-		ComParams.c_cflag |= B9600;
-		tcsetattr( fd, TCSANOW, &ComParams );
-    
-		std::cout << "Success in opening serial port\n";
-		bInited = true;
-		return true;
-
-	//---------------------------------------------
-	#endif
-	//---------------------------------------------
-	
-	//---------------------------------------------
-	#ifdef TARGET_WIN32
-	//---------------------------------------------
-		hComm = CreateFileA(device_path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-
-		if (hComm == INVALID_HANDLE_VALUE) {
-			std::cout << "Unable to open port\n";
-			return false;
-		}
-
-		COMMCONFIG cfg;
-		DWORD cfgSize;
-		char  buf[80];
-		cfgSize = sizeof(cfg);
-		// arduino is standard 8N1. We'll use 9600 baud since we're not doing anything intensive
-		sprintf(buf, "baud=9600 parity=N data=8 stop=1");
-
-		GetCommConfig(hComm, &cfg, &cfgSize);
-
-		#if (_MSC_VER)       // microsoft visual studio
-			// msvc doesn't like BuildCommDCB,
-			//so we need to use this version: BuildCommDCBA
-			if (!BuildCommDCBA(buf, &cfg.dcb)){
-				std::cout << "ERROR: Something went wrong with the serial connection. Insert unhelpful error message here.";
-			}
-		#else
-		if (!BuildCommDCB(buf, &cfg.dcb)){
-			std::cout << "Something went wrong with the serial connection. Insert unhelpful error message here.";
-		}
-		#endif
-
-		if (!SetCommState(hComm, &cfg.dcb)){
-			std::cout << "ERROR: Can't set comm state";
-		}
-
-		// Set communication timeouts (NT)
-		COMMTIMEOUTS tOut;
-		GetCommTimeouts(hComm, &oldTimeout);
-		tOut = oldTimeout;
-		// Make timeout so that:
-		// - return immediately with buffered characters
-		tOut.ReadIntervalTimeout = MAXDWORD;
-		tOut.ReadTotalTimeoutMultiplier = 0;
-		tOut.ReadTotalTimeoutConstant = 0;
-		SetCommTimeouts(hComm, &tOut);
-
-		std::cout << "Success in opening serial port\n";
-		bInited = true;
-		return true;
-	//---------------------------------------------
-	#endif
-	//---------------------------------------------
+    bArduinoFound = true;
 }
 
-void Arduino::close(){
+void Arduino::setBaud(int baud) {
+    // set baud rate - currently OSX and Linux only, Windows support forthcoming
+
+    // safety until Windows support comes
+    #ifdef TARGET_WIN32
+        return;
+    #else
+    
+    struct termios ComParams;
+    tcgetattr(fd, &ComParams);
+    oldoptions = ComParams;
+    
+    switch(baud){
+        case 300: 	cfsetispeed(&ComParams,B300);
+            cfsetospeed(&ComParams,B300);
+            break;
+        case 1200:
+            cfsetispeed(&ComParams,B1200);
+            cfsetospeed(&ComParams,B1200);
+            break;
+        case 2400: 	cfsetispeed(&ComParams,B2400);
+            cfsetospeed(&ComParams,B2400);
+            break;
+        case 4800: 	cfsetispeed(&ComParams,B4800);
+            cfsetospeed(&ComParams,B4800);
+            break;
+        case 9600: 	cfsetispeed(&ComParams,B9600);
+            cfsetospeed(&ComParams,B9600);
+            break;
+        case 14400: 	cfsetispeed(&ComParams,B14400);
+            cfsetospeed(&ComParams,B14400);
+            break;
+        case 19200: 	cfsetispeed(&ComParams,B19200);
+            cfsetospeed(&ComParams,B19200);
+            break;
+        case 28800: 	cfsetispeed(&ComParams,B28800);
+            cfsetospeed(&ComParams,B28800);
+            break;
+        case 38400: 	cfsetispeed(&ComParams,B38400);
+            cfsetospeed(&ComParams,B38400);
+            break;
+        case 57600:  cfsetispeed(&ComParams,B57600);
+            cfsetospeed(&ComParams,B57600);
+            break;
+        case 115200: cfsetispeed(&ComParams,B115200);
+            cfsetospeed(&ComParams,B115200);
+            break;
+            
+        default:
+            cfsetispeed(&ComParams,B9600);
+            cfsetospeed(&ComParams,B9600);
+            std::cout << "\rCannot set " << baud << " bps, setting to 9600" << std::endl;
+            break;
+    }
+    
+    ComParams.c_cflag |= (CLOCAL | CREAD);
+    ComParams.c_cflag &= ~PARENB;
+    ComParams.c_cflag &= ~CSTOPB;
+    ComParams.c_cflag &= ~CSIZE;
+    ComParams.c_iflag &= (tcflag_t) ~(INLCR | IGNCR | ICRNL | IGNBRK);
+    ComParams.c_oflag &= (tcflag_t) ~(OPOST);
+    ComParams.c_cflag |= CS8;
+    tcsetattr( fd, TCSANOW, &ComParams );
+    
+    unsigned long retrievedBaud = cfgetospeed(&ComParams);
+    printToConsole("Setting baud rate " + to_string(retrievedBaud));
+    currentBaud = retrievedBaud;
+    
+#endif
+}
+
+bool Arduino::openPort() {
+    bIsInited = false;
+    
+    //---------------------------------------------
+#if defined( TARGET_OSX ) || defined( TARGET_LINUX )
+	//---------------------------------------------
+    
+    // open the serial device
+    fd = open(device_path.c_str(), O_RDWR | O_NONBLOCK);
+    
+    if(fd == -1){
+        std::cout << "\rUnable to open port" << std::endl;
+        return false;
+    }
+    
+    // safety - set baud rate once more after open
+    setBaud((int)currentBaud);
+    
+    std::cout << "\rSuccess in opening serial port at " << device_path << std::endl;
+    struct termios opts;
+    tcgetattr(fd, &opts);
+    unsigned long retrievedBaud = cfgetospeed(&opts);
+    
+    std::cout << "\rAt baud rate " << to_string(retrievedBaud) << std::endl;
+    
+    bIsInited = true;
+    return true;
+#endif
+    
+    //---------------------------------------------
+#ifdef TARGET_WIN32
+	//---------------------------------------------
+    hComm = CreateFileA(device_path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+    
+    if (hComm == INVALID_HANDLE_VALUE) {
+        std::cout << "\rUnable to open port" << std::endl;
+        return false;
+    }
+    
+    COMMCONFIG cfg;
+    DWORD cfgSize;
+    char  buf[80];
+    cfgSize = sizeof(cfg);
+    // arduino is standard 8N1. We'll use 9600 baud since we're not doing anything intensive
+    sprintf(buf, "baud=9600 parity=N data=8 stop=1");
+    
+    GetCommConfig(hComm, &cfg, &cfgSize);
+    
+#if (_MSC_VER)       // microsoft visual studio
+    // msvc doesn't like BuildCommDCB,
+    //so we need to use this version: BuildCommDCBA
+    if (!BuildCommDCBA(buf, &cfg.dcb)){
+        std::cout << "\rERROR: Something went wrong with the serial connection. Insert unhelpful error message here." << std::endl;
+    }
+#else
+    if (!BuildCommDCB(buf, &cfg.dcb)){
+        std::cout << "\rSomething went wrong with the serial connection. Insert unhelpful error message here." << std::endl;
+    }
+#endif
+    
+    if (!SetCommState(hComm, &cfg.dcb)){
+        std::cout << "\rERROR: Can't set comm state" << std::endl;
+    }
+    
+    // Set communication timeouts (NT)
+    COMMTIMEOUTS tOut;
+    GetCommTimeouts(hComm, &oldTimeout);
+    tOut = oldTimeout;
+    // Make timeout so that:
+    // - return immediately with buffered characters
+    tOut.ReadIntervalTimeout = MAXDWORD;
+    tOut.ReadTotalTimeoutMultiplier = 0;
+    tOut.ReadTotalTimeoutConstant = 0;
+    SetCommTimeouts(hComm, &tOut);
+    
+    std::cout << "\rSuccess in opening serial port" << std::endl;
+    bInited = true;
+    return true;
+	//---------------------------------------------
+#endif
+	//---------------------------------------------
+    
+    return false;
+}
+
+bool Arduino::connect(int baud, bool verbose) {
+	find();
+    setBaud(baud);
+    bool success = openPort();
+    
+    return success;
+}
+
+void Arduino::closePort(){
 
 	//---------------------------------------------
 #ifdef TARGET_WIN32
 	//---------------------------------------------
-	if (bInited){
+	if (bIsInited){
 		SetCommTimeouts(hComm, &oldTimeout);
 		CloseHandle(hComm);
 		hComm = INVALID_HANDLE_VALUE;
@@ -128,8 +215,8 @@ void Arduino::close(){
 	//---------------------------------------------
 #else
 	//---------------------------------------------
-	if (bInited){
-//		tcsetattr(fd, TCSANOW, &oldoptions);
+	if (bIsInited){
+		tcsetattr(fd, TCSANOW, &oldoptions);
 		::close(fd);
 	}
 	// [CHECK] -- anything else need to be reset?
@@ -139,20 +226,45 @@ void Arduino::close(){
 
 }
 
-void Arduino::reset() {
-    // set a high bit over the serial line, wait, then reset
-    // this will smack the Arduino into resetting
-    std::cout<<"Resetting Arduino..." << std::endl;
-#ifdef TARGET_WIN32
-	// with thanks to http://stackoverflow.com/questions/18539104/controlling-dtr-and-rts-pin-of-serial-port-in-c-on-windows-platform
-	EscapeCommFunction(hComm,SETDTR);
-	Sleep(500);
-	EscapeCommFunction(hComm,CLRDTR);
-#else
-    ioctl(fd, TIOCMBIS, TIOCM_DTR);
-    usleep(500);
-    ioctl(fd, TIOCMBIC, TIOCM_DTR);
-#endif
+void Arduino::reset(int _board) {
+    if(!bArduinoFound) find();
+    sleep(1);
+    
+    if(_board == LEONARDO) {
+        // force reset using 1200bps open/close
+        // not working?
+        setBaud(57600);
+        closePort();
+        openPort();
+        closePort();
+        sleep(1);
+        setBaud(1200);
+        openPort();
+        closePort();
+        openPort();
+        closePort();
+        sleep(1);
+    }
+    
+    else {
+        // set a high bit over the serial line, wait, then reset
+        // this will smack the Arduino into resetting
+        std::cout<<"\rResetting Arduino..." << std::endl;
+        
+        setBaud(9600);
+        openPort();
+        
+        #ifdef TARGET_WIN32
+            // with thanks to http://stackoverflow.com/questions/18539104/controlling-dtr-and-rts-pin-of-serial-port-in-c-on-windows-platform
+            EscapeCommFunction(hComm,SETDTR);
+            Sleep(500);
+            EscapeCommFunction(hComm,CLRDTR);
+        #else
+            ioctl(fd, TIOCMBIS, TIOCM_DTR);
+            usleep(500);
+            ioctl(fd, TIOCMBIC, TIOCM_DTR);
+        #endif
+    }
 }
 
 //////////////////////////////////////////////
@@ -161,6 +273,10 @@ void Arduino::reset() {
 //                                          //
 //////////////////////////////////////////////
 
+inline void Arduino::printToConsole(std::string str) {
+    std::cout << "\r" << str << std::endl;
+}
+
 void Arduino::listDetectedDevices() {
     for(int i = 0; i < arduinos.size(); i++) {
         string index = to_string(i);
@@ -168,6 +284,7 @@ void Arduino::listDetectedDevices() {
     }
 }
 
+// TO-DO :: WINDOWS SUPPORT
 vector<string> Arduino::findArduinos() {
     // modified from code by Stephen Braitsch
     // https://github.com/braitsch
@@ -185,9 +302,9 @@ vector<string> Arduino::findArduinos() {
 }
 
 string Arduino::chooseActiveDevice() {
-    cout << "Multiple Arduinos detected:/n";
+    cout << "\rMultiple Arduinos detected:/n";
     listDetectedDevices();
-    cout << "Please choose active device: ";
+    cout << "\rPlease choose active device: ";
     string input;
     int deviceIndex;
     bool input_is_int = false;
@@ -222,7 +339,7 @@ string Arduino::chooseActiveDevice() {
     }
     
     else {
-        cout << "Selection invalid. Please make sure input is a valid port index or path.";
+        cout << "\rSelection invalid. Please make sure input is a valid port index or path." << std::endl;
         chooseActiveDevice();
     }
     
@@ -246,7 +363,7 @@ vector<string> Arduino::buildDeviceList() {
     
 		string deviceName	= "";
     
-		if (dir == NULL) std::cout << "Error listing devices in /dev";
+        if (dir == NULL) std::cout << "\rError listing devices in /dev" << std::endl;
 		
 		else {
 			//for each device

@@ -1,6 +1,6 @@
 //
 //  Arduino.h
-//  Trenchcoat
+//  reset-arduino
 //
 //  Created by William A. Clark on 6/14/13.
 //  Do as ye please.
@@ -39,19 +39,29 @@
 #include <errno.h>
 #include <ctype.h>
 
+typedef enum {
+    LEONARDO,
+    OTHER
+} Boards;
+
 
 class Arduino {
     public:
         Arduino();
 		~Arduino();
     
-        bool connect(int baud);
-		void close();
-        void reset();
+        void find();
+        void setBaud(int baud = 9600);
+        bool openPort();
+        void closePort();
+        bool connect(int baud = 9600, bool verbose = true);
+        void reset(int _board = OTHER);
     
     private:
 
     // METHODS
+    
+        inline void printToConsole(std::string str);
 
         std::vector<std::string> findArduinos();
         std::vector<std::string> buildDeviceList();
@@ -73,11 +83,14 @@ class Arduino {
 	#else
 		int fd;
 	#endif
-
-        std::string device_path;  
+        bool bIsInited, bArduinoFound;
+    
+        struct termios oldoptions;
+        unsigned long currentBaud;
+    
+        std::string device_path;
         std::vector<std::string> devices;
         std::vector<std::string> arduinos;
-		bool bInited;
     
         struct Device {
             int index;

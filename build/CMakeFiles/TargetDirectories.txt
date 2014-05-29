@@ -1,3 +1,4 @@
-C:/Users/Stephen/Documents/GitHub/reset-arduino/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Stephen/Documents/GitHub/reset-arduino/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/Stephen/Documents/GitHub/reset-arduino/build/CMakeFiles/reset-arduino.dir
+/Users/clark/dev/arduino/reset-arduino/build/CMakeFiles/ALL_BUILD.dir
+/Users/clark/dev/arduino/reset-arduino/build/libs/CMakeFiles/Arduino.dir
+/Users/clark/dev/arduino/reset-arduino/build/CMakeFiles/ZERO_CHECK.dir
+/Users/clark/dev/arduino/reset-arduino/build/CMakeFiles/reset-arduino.dir
